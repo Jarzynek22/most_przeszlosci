@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt – Most Przeszłości</title>
+<link rel="stylesheet" href="style.css">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3ZJJ73HS0K"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3ZJJ73HS0K');
+</script>
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "vzgn0ubxgj");
+</script>
+<style>
+
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;}
+.contact-info h2{font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;}
+.contact-item{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.5rem;}
+.contact-icon{width:40px;height:40px;border-radius:50%;background:rgba(196,135,74,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.contact-item h3{font-family:'Source Sans 3',sans-serif;font-size:.85rem;font-weight:600;margin-bottom:.25rem;}
+.contact-item p{color:var(--muted);font-size:.9rem;white-space:pre-line;}
+.contact-form{background:var(--card);border-radius:var(--radius);padding:2rem;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.form-group{margin-bottom:1.25rem;}
+.form-group label{display:block;font-size:.875rem;font-weight:500;margin-bottom:.35rem;}
+.form-group input,.form-group textarea{width:100%;padding:.65rem 1rem;border:1px solid var(--border);border-radius:calc(var(--radius) - 2px);background:var(--bg);color:var(--fg);font-family:'Source Sans 3',sans-serif;font-size:.9rem;outline:none;transition:box-shadow .2s;}
+.form-group input:focus,.form-group textarea:focus{box-shadow:0 0 0 3px rgba(196,135,74,.25);}
+.form-group textarea{resize:none;}
+.success-box{background:var(--card);border-radius:var(--radius);padding:2.5rem;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.success-box h3{font-size:1.4rem;margin-bottom:.5rem;}
+.success-box p{color:var(--muted);}
+@media(max-width:768px){.contact-grid{grid-template-columns:1fr;}}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a class="logo-link" href="index.html">
+      <img src="logo.png" alt="">
+      <span>Most Przeszłości</span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Strona główna</a>
+      <a href="o-projekcie.html">O projekcie</a>
+      <a href="wspolpraca.html">Współpraca</a>
+      <a href="galeria.html">Galeria</a>
+      <a href="mapa.html">Mapa miejsc</a>
+      <a href="kontakt.html" class="active">Kontakt</a>
+    </nav>
+    <button class="burger" onclick="toggleMobile()" aria-label="Menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav">
+    <a href="index.html">Strona główna</a>
+    <a href="o-projekcie.html">O projekcie</a>
+    <a href="wspolpraca.html">Współpraca</a>
+    <a href="galeria.html">Galeria</a>
+    <a href="mapa.html">Mapa miejsc</a>
+    <a href="kontakt.html" class="active">Kontakt</a>
+  </nav>
+</header>
+<section class="section-hero">
+  <div class="container"><div class="anim"><h1>Kontakt</h1><div class="section-divider"></div><p>Skontaktuj się z nami</p></div></div>
+</section>
+<section class="py-16">
+  <div class="container" style="max-width:960px">
+    <div class="contact-grid">
+      <div class="contact-info anim">
+        <h2>Dane kontaktowe</h2>
+        <div class="contact-item">
+  <div class="contact-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+  </div>
+  <div>
+    <h3>Email</h3>
+    <p><a href="mailto:mostprzeszlosci@gmail.com" style="color: inherit; text-decoration: none;">mostprzeszlosci@gmail.com</a></p>
+  </div>
+</div>
+
+<div class="contact-item">
+  <div class="contact-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+      <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" stroke-width="3"/>
+    </svg>
+  </div>
+  <div>
+    <h3>Instagram</h3>
+    <p><a href="https://www.instagram.com/most_przeszlosci/" target="_blank" rel="noopener noreferrer" class="social-link" style="color: inherit; text-decoration: none;">@most_przeszlosci</a></p>
+  </div>
+</div>
+
+<div class="contact-item">
+  <div class="contact-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+    </svg>
+  </div>
+  <div>
+    <h3>TikTok</h3>
+    <p><a href="https://www.tiktok.com/@most.przeszlosci" target="_blank" rel="noopener noreferrer" class="social-link" style="color: inherit; text-decoration: none;">@most.przeszlosci</a></p>
+  </div>
+</div>
+      </div>
+    <div class="anim">
+  <div id="form-wrap">
+    <form 
+      class="contact-form"
+      action="https://formspree.io/f/xvzwboay"   
+      method="POST">
+      <div class="form-group">
+        <label>Imię i nazwisko</label>
+        <input type="text" name="name" required>   
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" required> 
+      </div>
+      <div class="form-group">
+        <label>Temat</label>
+        <input type="text" name="subject" required> 
+      </div>
+      <div class="form-group">
+        <label>Wiadomość</label>
+        <textarea rows="5" name="message" required></textarea> 
+      </div>
+      <button type="submit" class="btn btn-full">Wyślij wiadomość</button>
+    </form>
+  </div>
+  </div>
+    </div>
+  </div>
+</section>
+<script>
+function submitForm(e){e.preventDefault();document.getElementById('form-wrap').innerHTML='<div class="success-box"><h3>Dziękujemy!</h3><p>Twoja wiadomość została wysłana. Odpowiemy najszybciej jak to możliwe.</p></div>';}
+</script>
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="logo.png" alt="">
+        <div><h3>Most Przeszłości</h3><p>Łączymy przeszłość z przyszłością</p></div>
+      </div>
+      <div class="footer-nav">
+        <h4>Nawigacja</h4>
+        <a href="index.html">Strona główna</a>
+        <a href="o-projekcie.html">O projekcie</a>
+        <a href="wspolpraca.html">Współpraca</a>
+        <a href="galeria.html">Galeria</a>
+        <a href="mapa.html">Mapa miejsc</a>
+        <a href="kontakt.html">Kontakt</a>
+      </div>
+      <div class="footer-contact">
+  <h4>Kontakt</h4>
+  <p><a href="mailto:mostprzeszlosci@gmail.com" style="color: inherit; text-decoration: none;">mostprzeszlosci@gmail.com</a></p>
+  <div style="display: flex; gap: 20px; margin-top: 10px;">
+    <a href="https://www.instagram.com/most_przeszlosci/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 5px; color: inherit; text-decoration: none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+        <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" stroke-width="3"/>
+      </svg>
+      <span>Instagram</span>
+    </a>
+    <a href="https://www.tiktok.com/@most.przeszlosci" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 5px; color: inherit; text-decoration: none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+      </svg>
+      <span>TikTok</span>
+    </a>
+  </div>
+</div>
+    </div>
+    <div class="footer-bottom">© 2026 Most Przeszłości. Wszelkie prawa zastrzeżone.</div>
+  </div>
+</footer>
+<script>
+let _mob=false;
+function toggleMobile(){_mob=!_mob;document.getElementById('mobile-nav').classList.toggle('open',_mob);}
+function observeAnims(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+  },{threshold:0.12});
+  document.querySelectorAll('.anim').forEach(el=>obs.observe(el));
+}
+document.addEventListener('DOMContentLoaded',observeAnims);
+</script>
+</body>
+</html>
