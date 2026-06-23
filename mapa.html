@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mapa miejsc – Most Przeszłości</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3ZJJ73HS0K"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3ZJJ73HS0K');
+</script>
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "vzgn0ubxgj");
+</script>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Shared styles -->
+<link rel="stylesheet" href="style.css" />
+
+<style>
+/* ── PAGE HERO ── */
+.map-hero {
+  background: linear-gradient(135deg, rgba(196,135,74,0.13), rgba(143,164,184,0.08));
+  padding: 7rem 0 4rem; margin-top: 72px; text-align: center;
+}
+.map-hero h1 { font-size: clamp(2rem,5vw,3.5rem); font-weight: 700; margin-bottom: 0.75rem; }
+.map-hero p { color: var(--muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+/* ── LAYOUT ── */
+.map-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 0;
+  height: calc(100vh - 72px - 200px);
+  min-height: 560px;
+  margin: 2.5rem 0 3rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(45,61,92,0.18);
+}
+
+/* ── SIDEBAR ── */
+.map-sidebar {
+  background: var(--primary);
+  color: var(--primary-fg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sidebar-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(245,241,235,0.1);
+  flex-shrink: 0;
+}
+.sidebar-header h2 {
+  font-size: 1rem; font-weight: 700; color: var(--primary-fg);
+  letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.75rem;
+}
+.search-box {
+  position: relative;
+}
+.search-box input {
+  width: 100%; padding: 0.55rem 0.9rem 0.55rem 2.4rem;
+  border: 1px solid rgba(245,241,235,0.15);
+  border-radius: 6px; background: rgba(245,241,235,0.07);
+  color: var(--primary-fg); font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.875rem; outline: none; transition: border-color 0.2s;
+}
+.search-box input::placeholder { color: rgba(245,241,235,0.35); }
+.search-box input:focus { border-color: var(--accent); }
+.search-box svg {
+  position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+  color: rgba(245,241,235,0.4); pointer-events: none;
+}
+
+/* category filter pills */
+.cat-pills {
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid rgba(245,241,235,0.08);
+  flex-shrink: 0;
+}
+.cat-pill {
+  padding: 0.25rem 0.75rem; border-radius: 999px; border: none; cursor: pointer;
+  font-size: 0.75rem; font-weight: 600; transition: all 0.2s;
+  font-family: 'Source Sans 3', sans-serif;
+  background: rgba(245,241,235,0.1); color: rgba(245,241,235,0.65);
+}
+.cat-pill.active, .cat-pill:hover {
+  background: var(--accent); color: #fff;
+}
+
+/* place list */
+.place-list {
+  overflow-y: auto; flex: 1; padding: 0.5rem 0;
+}
+.place-list::-webkit-scrollbar { width: 4px; }
+.place-list::-webkit-scrollbar-track { background: transparent; }
+.place-list::-webkit-scrollbar-thumb { background: rgba(245,241,235,0.2); border-radius: 2px; }
+
+.place-item {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.85rem 1.5rem; cursor: pointer; transition: background 0.15s;
+  border-left: 3px solid transparent;
+}
+.place-item:hover { background: rgba(245,241,235,0.06); }
+.place-item.active {
+  background: rgba(196,135,74,0.12);
+  border-left-color: var(--accent);
+}
+.place-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 5px;
+}
+.place-item-text { min-width: 0; }
+.place-item-name {
+  font-size: 0.9rem; font-weight: 600; color: var(--primary-fg);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.place-item-meta { font-size: 0.78rem; color: rgba(245,241,235,0.5); margin-top: 1px; }
+
+/* ── MAP CONTAINER ── */
+#map { height: 100%; width: 100%; }
+
+/* ── POPUP STYLING ── */
+.leaflet-popup-content-wrapper {
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(45,61,92,0.22) !important;
+  border: none !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.leaflet-popup-content { margin: 0 !important; width: auto !important; min-width: 240px; }
+.leaflet-popup-tip { background: white !important; }
+.popup-inner { padding: 1.1rem 1.25rem 1rem; }
+.popup-cat {
+  display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 0.5rem;
+}
+.popup-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: #232b3e; }
+
+/* ── LEGEND ── */
+.map-legend {
+  display: flex; flex-wrap: wrap; gap: 1rem 2rem;
+  justify-content: center; margin-bottom: 3rem;
+}
+.legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--muted); }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: var(--border); border-radius: 10px; overflow: hidden;
+  margin-bottom: 2.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.stat-cell {
+  background: var(--card); padding: 1.25rem 1rem; text-align: center;
+}
+.stat-num {
+  font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700;
+  color: var(--accent); line-height: 1;
+}
+.stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .map-layout { grid-template-columns: 1fr; grid-template-rows: 260px 1fr; height: auto; min-height: 700px; }
+  .map-sidebar { grid-row: 2; max-height: 340px; }
+  #map { height: 380px; }
+  .stats-bar { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 500px) {
+  .stats-bar { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo-link" href="index.html">
+      <img src="logo.png" alt="">
+      <span>Most Przeszłości</span>
+    </a>
+    <nav class="main-nav"><a href="index.html">Strona główna</a>
+    <a href="o-projekcie.html">O projekcie</a>
+    <a href="nasza-droga.html">Nasza droga</a>
+    <a href="wspolpraca.html">Współpraca</a>
+    <a href="galeria.html" >Galeria</a>
+    <a href="mapa.html" class="active">Mapa miejsc</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+  <button class="burger" onclick="toggleMobile()" aria-label="Menu">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+         stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav"><a href="index.html" class="">Strona główna</a>
+<a href="o-projekcie.html" class="">O projekcie</a>
+<a href="nasza-droga.html">Nasza droga</a>
+<a href="wspolpraca.html">Współpraca</a>
+<a href="galeria.html" class="">Galeria</a>
+<a href="mapa.html" class="active">Mapa miejsc</a>
+<a href="kontakt.html" class="">Kontakt</a></nav>
+</header>
+
+<!-- HERO -->
+<section class="map-hero">
+  <div class="container">
+    <div class="anim">
+      <h1>Mapa miejsc</h1>
+      <div class="section-divider"></div>
+      <p>Odkryj miejsca, o których mówimy — każdy pin to fragment historii, który czeka na odkrycie.</p>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- STATS -->
+  <div class="stats-bar anim">
+    <div class="stat-cell"><div class="stat-num" id="stat-all">0</div><div class="stat-label">wszystkich miejsc</div></div>
+    <div class="stat-cell"><div class="stat-num" id="stat-visible">0</div><div class="stat-label">widocznych</div></div>
+    <div class="stat-cell"><div class="stat-num" id="stat-cats">0</div><div class="stat-label">kategorii</div></div>
+  </div>
+
+  <!-- MAP + SIDEBAR -->
+  <div class="map-layout anim">
+    <!-- sidebar -->
+    <div class="map-sidebar">
+      <div class="sidebar-header">
+        <h2>Miejsca</h2>
+        <div class="search-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-input" placeholder="Szukaj miejsca…" oninput="onSearch()" />
+        </div>
+      </div>
+      <div class="cat-pills" id="cat-pills"></div>
+      <div class="place-list" id="place-list"></div>
+    </div>
+    <!-- map -->
+    <div id="map"></div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="map-legend anim" id="map-legend"></div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="logo.png" alt="">
+        <div>
+          <h3>Most Przeszłości</h3>
+          <p>Łączymy przeszłość z przyszłością</p>
+        </div>
+      </div>
+      <div class="footer-nav">
+        <h4>Nawigacja</h4>
+        <a href="index.html">Strona główna</a><a href="o-projekcie.html">O projekcie</a><a href="nasza-droga.html">Nasza droga</a><a href="wspolpraca.html">Współpraca</a><a href="galeria.html">Galeria</a><a href="mapa.html">Mapa miejsc</a><a href="kontakt.html">Kontakt</a>
+      </div>
+      <div class="footer-contact">
+  <h4>Kontakt</h4>
+  <p><a href="mailto:mostprzeszlosci@gmail.com" style="color: inherit; text-decoration: none;">mostprzeszlosci@gmail.com</a></p>
+  <div style="display: flex; gap: 20px; margin-top: 10px;">
+    <a href="https://www.instagram.com/most_przeszlosci/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 5px; color: inherit; text-decoration: none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+        <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" stroke-width="3"/>
+      </svg>
+      <span>Instagram</span>
+    </a>
+    <a href="https://www.tiktok.com/@most.przeszlosci" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 5px; color: inherit; text-decoration: none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+      </svg>
+      <span>TikTok</span>
+    </a>
+  </div>
+</div>
+    </div>
+    <div class="footer-bottom">© 2026 Most Przeszłości. Wszelkie prawa zastrzeżone.</div>
+  </div>
+</footer>
+
+<script>
+let _mobileOpen = false;
+function toggleMobile() {
+  _mobileOpen = !_mobileOpen;
+  document.getElementById('mobile-nav').classList.toggle('open', _mobileOpen);
+}
+function observeAnims() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.anim').forEach(el => obs.observe(el));
+}
+document.addEventListener('DOMContentLoaded', observeAnims);
+</script>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const PLACES = [
+  { id:1,  name:"Bunkier B1",                     lat:51.55825836186496, lng:21.210490411723374, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:2,  name:"Bunkier B2",                     lat:51.55891561044295, lng:21.21492558543785,  category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:3,  name:"Bunkier B3",                     lat:51.55979539623737, lng:21.22013746078619,  category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:4,  name:"Bunkier B4",                     lat:51.55804904632193, lng:21.22154988994981,  category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:5,  name:"Bunkier B5",                     lat:51.5638893253645,  lng:21.220449477073977, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:6,  name:"Bunkier B6",                     lat:51.56308085865817, lng:21.22425456116053,  category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:7,  name:"Bunkier B7",                     lat:51.56237386269175, lng:21.22871618631328,  category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:8,  name:"Bunkier B8",                     lat:51.55824501817016, lng:21.210533326727155, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:9,  name:"Bunkier B9",                     lat:51.56033587388876, lng:21.233125074058144, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:10, name:"Bunkier B10",                    lat:51.56192782173406, lng:21.236693660411625, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:11, name:"Bunkier B11",                    lat:51.56707015809885, lng:21.227106744052925, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:12, name:"Bunkier B12",                    lat:51.55620211501035, lng:21.20074940754766,  category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:13, name:"Bunkier B13",                    lat:51.470853091989454,lng:21.234415131888998, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:14, name:"Bunkier B14",                    lat:51.470557826586834,lng:21.238479686675742, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:15, name:"Bunkier B15",                    lat:51.5557739675691,  lng:21.258538901794726, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:16, name:"Bunkier Obserwacyjny",           lat:51.637514704423616,lng:21.27738464931527,  category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:17, name:"Strzelnica Niemiecka",           lat:51.558362584625044,lng:21.205012186987155, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:18, name:"Strzelnica Niemiecka",           lat:51.53970784904757, lng:21.195904458358616, category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+  { id:19, name:"Ruiny Obozu",                    lat:51.55074337132849, lng:21.19085892268604,  category:"Poligon Wojskowy Lager Kruszyna", color:"#FF0000" },
+
+  { id:20, name:"Drukarnia Jana Kantego Trzebińskiego", lat:51.40125368030945, lng:21.15106956270716,  category:"Drukarnia Jana Kantego Trzebińskiego", color:"#0000FF" },
+
+  { id:21, name:"Piotrkówka - najstarsza część Radomia", lat:51.39984039528256, lng:21.13324554590964,   category:"Piotrówka", color:"#FF00FF" },
+
+  { id:22, name:"Dom Podworskich", lat:51.40126347003967, lng:21.15450684665674,  category:"Dom Podworskich", color:"#FFFF00" },
+
+  { id:23, name:"Dwór w Milejowicach", lat:51.42371828397855, lng:21.07706171855911,  category:"Dwór w Milejowicach", color:"#8000FF" },
+
+  { id:24, name:"Dawny Zamek Królewski przy Wałowej", lat:51.402932054628, lng:21.14300280453091,  category:"Dawny Zamek Królewski przy Wałowej", color:"#00CED1" },
+
+  { id:25, name:"Zakłady Metalowe “Łucznik”", lat:51.38945369052403, lng:21.14648747216018,  category:"Zakłady Metalowe “Łucznik”", color:"#A0522D" },
+
+];
+
+// ═══════════════════════════════════════════════
+// CATEGORIES & COLORS
+// ═══════════════════════════════════════════════
+const CAT_COLORS = {};
+PLACES.forEach(p => CAT_COLORS[p.category] = p.color);
+
+const ALL_CATS = [...new Set(PLACES.map(p => p.category))];
+
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let activeCat = "Wszystkie";
+let searchQ = "";
+let activeId = null;
+let markers = {};
+
+function filtered() {
+  return PLACES.filter(p => {
+    const catOk = activeCat === "Wszystkie" || p.category === activeCat;
+    const q = searchQ.toLowerCase();
+    const searchOk = !q || p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);    return catOk && searchOk;
+  });
+}
+
+// ═══════════════════════════════════════════════
+// MAP INIT
+// ═══════════════════════════════════════════════
+const map = L.map('map', { center:[52.0, 19.5], zoom:6, zoomControl:false });
+L.control.zoom({ position:'bottomright' }).addTo(map);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  subdomains: 'abcd', maxZoom: 19
+}).addTo(map);
+
+function makeIcon(color, active=false) {
+  const size = active ? 18 : 13;
+  const shadow = active ? '0 0 0 4px rgba(196,135,74,0.35)' : '0 2px 6px rgba(0,0,0,0.3)';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 30" width="${size*0.8}" height="${size}">
+    <path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 18 8 18s8-12.75 8-18c0-4.42-3.58-8-8-8z" fill="${color}" stroke="white" stroke-width="1.5"/>
+    <circle cx="12" cy="8" r="3.2" fill="white" opacity="0.85"/>
+  </svg>`;
+  return L.divIcon({
+    className: '',
+    html: `<div style="filter:drop-shadow(${shadow})">${svg}</div>`,
+    iconSize: [size*0.8, size],
+    iconAnchor: [size*0.4, size],
+    popupAnchor: [0, -size]
+  });
+}
+
+function popupHTML(p) {
+  return `<div class="popup-inner">
+    <span class="popup-cat" style="background:${p.color}22;color:${p.color}">${p.category}</span>
+    <div class="popup-name">${p.name}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderAll() {
+  Object.values(markers).forEach(m => map.removeLayer(m));
+  markers = {};
+
+  const vis = filtered();
+
+  vis.forEach(p => {
+    const m = L.marker([p.lat, p.lng], { icon: makeIcon(p.color, activeId===p.id) })
+      .addTo(map)
+      .bindPopup(popupHTML(p), { maxWidth:300 });
+    m.on('click', () => selectPlace(p.id));
+    markers[p.id] = m;
+  });
+
+  const list = document.getElementById('place-list');
+  list.innerHTML = vis.map(p => `
+    <div class="place-item ${activeId===p.id?'active':''}" onclick="selectPlace(${p.id})">
+      <div class="place-dot" style="background:${p.color}"></div>
+      <div class="place-item-text">
+        <div class="place-item-name">${p.name}</div>
+        <div class="place-item-meta">${p.category}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('stat-all').textContent = PLACES.length;
+  document.getElementById('stat-visible').textContent = vis.length;
+  document.getElementById('stat-cats').textContent = ALL_CATS.length;
+}
+
+function selectPlace(id) {
+  activeId = id;
+  const p = PLACES.find(x => x.id===id);
+  if (!p) return;
+  map.setView([p.lat, p.lng], 14, {animate:true, duration:0.8});
+  if (markers[id]) markers[id].openPopup();
+  renderAll();
+  setTimeout(() => {
+    const el = document.querySelector('.place-item.active');
+    if (el) el.scrollIntoView({block:'nearest', behavior:'smooth'});
+  }, 100);
+}
+
+// ═══════════════════════════════════════════════
+// FILTER PILLS
+// ═══════════════════════════════════════════════
+function buildCatPills() {
+  const all = ["Wszystkie", ...ALL_CATS];
+  document.getElementById('cat-pills').innerHTML = all.map(c => `
+    <button class="cat-pill ${activeCat===c?'active':''}" onclick="setCat('${c}')">${c}</button>
+  `).join('');
+}
+
+function setCat(cat) {
+  activeCat = cat; activeId = null;
+  buildCatPills(); renderAll();
+}
+
+function onSearch() {
+  searchQ = document.getElementById('search-input').value;
+  activeId = null; renderAll();
+}
+
+// ═══════════════════════════════════════════════
+// LEGEND
+// ═══════════════════════════════════════════════
+function buildLegend() {
+  document.getElementById('map-legend').innerHTML = ALL_CATS.map(c => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${CAT_COLORS[c]}"></div>
+      <span>${c}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+buildCatPills();
+buildLegend();
+renderAll();
+</script>
+
+</body>
+</html>
